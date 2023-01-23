@@ -22,6 +22,7 @@ class WebsiteCommand(PluginCommand):
 
           Usage:
                 website chmod [--recursive] [--parallel] [DIRECTORY] [--dryrun]
+                website broken links [DIRECTORY] [--dryrun]
 
           This command introduces some convenient website manipulation programs.
 
@@ -57,17 +58,12 @@ class WebsiteCommand(PluginCommand):
 
         w = Website()
 
-        w.permissions(dryrun=arguments.dryrun,
-                      directory=arguments.DIRECTORY,
-                      recursive=arguments.recursive,
-                      parallel=arguments.parallel)
-        #
-        # It is important to keep the programming here to a minimum and any substantial programming ought
-        # to be conducted in a separate class outside the command parameter manipulation. If between the
-        # elif statement you have more than 10 lines, you may consider putting it in a class that you import
-        # here and have propper methods in that class to handle the functionality. See the Manager class for
-        # an example.
-        #
-
+        if arguments.chmod:
+            w.permissions(dryrun=arguments.dryrun,
+                          directory=arguments.DIRECTORY,
+                          recursive=arguments.recursive,
+                          parallel=arguments.parallel)
+        elif arguments.broken and arguments.links:
+            w.broken_links(directory=arguments.DIRECTORY, dryrun=arguments.dryrun)
 
         return ""

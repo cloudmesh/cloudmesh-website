@@ -1,6 +1,6 @@
 import textwrap
 import os
-
+from cloudmesh.common.util import banner
 class Website:
 
     def permissions(self,
@@ -17,6 +17,15 @@ class Website:
             background = " &"
         for command in commands:
             execute = command + background
-            print(execute)
+            print("#", execute)
             if not dryrun:
+                os.system(execute)
+
+    def broken_links(self,
+                     directory=".",
+                     dryrun=False):
+        banner("Broken links")
+        execute = f'find "{directory}" -type l ! -exec test -e {{}} \\; -print'
+        print ("#", execute)
+        if not dryrun:
                 os.system(execute)
