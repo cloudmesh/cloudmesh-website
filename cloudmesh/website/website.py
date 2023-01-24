@@ -7,7 +7,7 @@ from pathlib import Path
 
 class Website:
 
-    def replace(self, directory=".", replace_file="replace.txt"):
+    def replace(self, directory=".", replace_file="replace.txt", find_only=False):
 
         exclude = ["gz", "tgz", "gif", "ppt", "pptx", "jpeg", "xsd", "java", "jar",
                    "c", "xml", "jpg", "png"]
@@ -20,7 +20,16 @@ class Website:
                 if Path(p).is_file() and  \
                         not p.is_symlink() and \
                         p.exists() and p_ending in include:
-                    print (p)
+                    print (p, end="")
+                    file = open(p, "r")
+                    content = file.read()
+                    file.close()
+                    if "http://grids.ucs.indiana.edu" in content:
+                        print ("*")
+                    else:
+                        print()
+
+
             except Exception as e:
                 pass
 
