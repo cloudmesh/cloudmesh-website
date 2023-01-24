@@ -10,7 +10,9 @@ class Website:
     def replace(self, directory=".", replace_file="replace.txt"):
         for p in Path(directory).rglob('*'):
             p_str = str(p)
-            if not p.is_symlink() and p.exists() and \
+            if Path(p).is_file() and  \
+                    not p.is_symlink() and \
+                    p.exists() and \
                     ".gz" not in p_str and \
                     ".zip" not in p_str:
                 print (p)
