@@ -14,13 +14,16 @@ class Website:
         include = ["htm", "html", "css"]
 
         for p in Path(directory).rglob('*'):
-            p_str = str(p)
-            p_ending = os.path.basename(p_str).split(".")[1].lower()
-            if Path(p).is_file() and  \
-                    not p.is_symlink() and \
-                    p.exists() and p_ending in include:
-                print (p)
-
+            try:
+                p_str = str(p)
+                p_ending = os.path.basename(p_str).split(".")[1].lower()
+                if Path(p).is_file() and  \
+                        not p.is_symlink() and \
+                        p.exists() and p_ending in include:
+                    print (p)
+            except Exception as e:
+                print ("Error", p)
+                
     def permissions(self,
                     directory=".",
                     recursive=True,
