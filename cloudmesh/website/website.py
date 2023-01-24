@@ -7,6 +7,11 @@ from pathlib import Path
 
 class Website:
 
+    def replace(self, directory=".", replace_file="replace.txt"):
+        for p in Path(directory).rglob('*'):
+            if not p.is_symlink() and p.exists():
+                print (p)
+
     def permissions(self,
                     directory=".",
                     recursive=True,
