@@ -12,6 +12,7 @@ from cloudmesh.common.util import path_expand
 from pathlib import Path
 import os
 
+
 class WebsiteCommand(PluginCommand):
 
     # noinspection PyUnusedLocal
@@ -22,7 +23,8 @@ class WebsiteCommand(PluginCommand):
 
           Usage:
                 website chmod [--recursive] [--parallel] [DIRECTORY] [--dryrun]
-                website broken links [DIRECTORY] [--dryrun]
+                website broken links [DIRECTORY] [--mode=python] [--relative] [--dryrun]
+                website rsync [--parameters=PARAMETERS] [--parallel] SOURCE DESTINATION [--dryrun]
 
           This command introduces some convenient website manipulation programs.
 
@@ -49,8 +51,7 @@ class WebsiteCommand(PluginCommand):
         variables = Variables()
         variables["debug"] = True
 
-        map_parameters(arguments, "recursive", "dryrun", "parallel")
-        arguments.DIRECTORY = os.path.abspath(arguments.DIRECTORY)
+        map_parameters(arguments, "recursive", "dryrun", "parallel", "python", "relative")
 
         VERBOSE(arguments)
 
@@ -59,11 +60,21 @@ class WebsiteCommand(PluginCommand):
         w = Website()
 
         if arguments.chmod:
+            arguments.DIRECTORY = os.path.abspath(arguments.DIRECTORY)
+
             w.permissions(dryrun=arguments.dryrun,
                           directory=arguments.DIRECTORY,
                           recursive=arguments.recursive,
                           parallel=arguments.parallel)
         elif arguments.broken and arguments.links:
-            w.broken_links(directory=arguments.DIRECTORY, dryrun=arguments.dryrun)
+            w.broken_links(directory=arguments.DIRECTORY,
+                           mode=arguments.mode,
+                           relative=arguments.relative,
+                           dryrun=arguments.dryrun)
+        elif arguments.rsync:
+            arguments.SOURCE = os.path.abspath(arguments.SOURCE)
+            arguments.DESTINATION = os.path.abspath(arguments.DESTINATION)
+            w.rsync_dir_in_parallel(source=arguments.SOURCE, destination=arguments.DESTINATION, dryrun=arguments.dryrun,
+                                    parallel=arguments.parallel)
 
         return ""

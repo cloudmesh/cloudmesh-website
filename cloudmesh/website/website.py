@@ -1,6 +1,10 @@
 import textwrap
 import os
 from cloudmesh.common.util import banner
+from cloudmesh.common.console import Console
+from pathlib import Path
+
+
 class Website:
 
     def permissions(self,
@@ -23,9 +27,65 @@ class Website:
 
     def broken_links(self,
                      directory=".",
-                     dryrun=False):
-        banner("Broken links")
-        execute = f'find "{directory}" -type l ! -exec test -e {{}} \\; -print'
-        print ("#", execute)
-        if not dryrun:
-                os.system(execute)
+                     dryrun=False,
+                     relative=False,
+                     mode="sh"):
+        banner("# Broken links")
+        if not relative:
+            d = os.path.abspath(directory)
+        else:
+            d = directory
+        if mode in ["sh"]:
+            execute = f'find "{d}" -type l ! -exec test -e {{}} \\; -print'
+            print ("#", execute)
+            if not dryrun:
+                    os.system(execute)
+        else:
+            print ("PPPP")
+            for p in Path(d).glob('*'):
+                if p.is_symlink() and not p.exists():
+                    location = os.readlink(p)
+                    print(f"found dangling symlink at {p} -> {location}")
+
+
+    def rsync_dir_in_parallel(self,
+                              source=".",
+                              destination=None,
+                              parallel=False,
+                              dryrun=False):
+        if destination is None:
+            Console.error("Destination not set properly")
+            return
+        elif os.path.abspath(destination) == os.path.abspath(source):
+            Console.error("Destination and source must not be the same")
+            return
+        banner("rsync directories in parallel")
+        if not parallel:
+            command = f"rsync -avP --info=progress2 {source} {destination}"
+            print("#", command)
+            if not dryrun:
+                os.system(command)
+        else:
+            pass
+            # find_dirs_in_source
+            # find files in source
+            # copy all files with rsync
+            # copy all dirs with rsync
+
+    def find_subdirectories(self, directory):
+        dirs = []
+        for path in Path(directory).iterdir():
+            if path.is_dir():
+                dirs.append(path)
+        return dirs
+
+    def find_files_in_dir(self, directory):
+        # list to store files
+        files = []
+
+        # Iterate directory
+        for path in os.listdir(directory):
+            # check if current path is a file
+            if os.path.isfile(os.path.join(directory, path)):
+                files.append(path)
+        return
