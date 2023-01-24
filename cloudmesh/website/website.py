@@ -22,8 +22,8 @@ class Website:
                         p.exists() and p_ending in include:
                     print (p)
             except Exception as e:
-                print ("Error", p)
-                
+                pass
+
     def permissions(self,
                     directory=".",
                     recursive=True,
