@@ -41,11 +41,10 @@ class Website:
             if not dryrun:
                     os.system(execute)
         else:
-            print ("PPPP")
-            for p in Path(d).glob('*'):
+            for p in Path(d).rglob('*'):
                 if p.is_symlink() and not p.exists():
                     location = os.readlink(p)
-                    print(f"found dangling symlink at {p} -> {location}")
+                    print(f"{p} -> {location}")
 
 
     def rsync_dir_in_parallel(self,
