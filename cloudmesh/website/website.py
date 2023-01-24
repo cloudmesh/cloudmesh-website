@@ -8,13 +8,17 @@ from pathlib import Path
 class Website:
 
     def replace(self, directory=".", replace_file="replace.txt"):
+
+        exclude = ["gz", "tgz", "gif", "ppt", "pptx", "jpeg", "xsd", "java", "jar",
+                   "c", "xml", "jpg", "png"]
+        include = ["htm", "html", "css"]
+
         for p in Path(directory).rglob('*'):
             p_str = str(p)
+            p_ending = os.path.basename(p_str).split(".")[1].lower()
             if Path(p).is_file() and  \
                     not p.is_symlink() and \
-                    p.exists() and \
-                    ".gz" not in p_str and \
-                    ".zip" not in p_str:
+                    p.exists() and p_ending in include:
                 print (p)
 
     def permissions(self,
