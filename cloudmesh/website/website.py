@@ -3,35 +3,79 @@ import os
 from cloudmesh.common.util import banner
 from cloudmesh.common.console import Console
 from pathlib import Path
-
+from cloudmesh.common.Shell import Shell
+from cloudmesh.common.util import readfile
 
 class Website:
 
+    def _readfile(self, name):
+        with open(name) as f:
+            content = f.read()
+        return content
+
+    def _writefile(self, name, content):
+        with open(name, "w") as f:
+            f.write(content)
+
     def replace(self, directory=".", replace_file="replace.txt", find_only=False):
 
-        exclude = ["gz", "tgz", "gif", "ppt", "pptx", "jpeg", "xsd", "java", "jar",
-                   "c", "xml", "jpg", "png"]
-        include = ["htm", "html", "css"]
+        r_content = readfile(replace_file)
+        content = r_content.splitlines()
 
+        exclude = Shell.cm_grep(content, "exclude=")[0].replace("exclude=", "").strip().split(" ")
+
+        include = Shell.cm_grep(content, "include=")[0].replace("include=", "").strip().split(" ")
+
+        content = Shell.find_lines_between(content, "# begin replace", "# en replace")[1:-1]
+        replace_data = []
+        for line in content:
+            (text_from, text_to) = line.split(" ", 1)
+            replace_data.append((text_from, text_to))
+
+        banner("BEGIN REPLACE SETUP")
+        print (r_content)
+        banner("END REPLACE SETUP")
+        print()
         for p in Path(directory).rglob('*'):
-            try:
-                p_str = str(p)
-                p_ending = os.path.basename(p_str).split(".")[1].lower()
-                if Path(p).is_file() and  \
-                        not p.is_symlink() and \
-                        p.exists() and p_ending in include:
-                    print (p, end="")
-                    file = open(p, "r")
-                    content = file.read()
-                    file.close()
-                    if "http://grids.ucs.indiana.edu" in content:
-                        print ("*")
-                    else:
-                        print()
+            if Path(p).is_symlink():
+                kind = "l"
+            elif Path(p).is_file():
+                kind = "f"
+            elif Path(p).is_dir():
+                kind = "d"
+            if kind not in ["d"]:
+                try:
+                    info = [f"Replace {p}"]
+                    p_str = str(p)
+                    p_ending = os.path.basename(p_str).split(".")[1].lower()
+                    if Path(p).is_file() and  \
+                            not p.is_symlink() and \
+                            p.exists() and \
+                            p_ending in include and \
+                            p_ending not in exclude:
+                        content = self._readfile(p_str)
+                        changed = False
+                        for replace_from, replace_to in replace_data:
+                            if replace_from in content:
+                                info.append(f"{p}: " + replace_from + " -> " + replace_to)
+                                content = content.replace(replace_from, replace_to)
+                                changed = True
+                        # banner(f"REPLACE {p}")
+                        # print(content)
+                        if changed:
+                            banner(info[0])
+                            print("\n".join(info[1:]))
+                            print()
+                            self._writefile(p_str, content)
+                        else:
+                            print("-", kind, p, flush=True)
+                except Exception as e:
+                    print("?", kind, p)
+            else:
+                print("-", kind, p)
 
-
-            except Exception as e:
-                pass
+        print()
+        print()
 
     def permissions(self,
                     directory=".",
