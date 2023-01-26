@@ -29,8 +29,9 @@ class Website:
         content = Shell.find_lines_between(content, "# begin replace", "# en replace")[1:-1]
         replace_data = []
         for line in content:
-            (text_from, text_to) = line.split(" ", 1)
-            replace_data.append((text_from, text_to))
+            if not line.startswith("#"):
+                (text_from, text_to) = line.split(" ", 1)
+                replace_data.append((text_from, text_to))
 
         banner("BEGIN REPLACE SETUP")
         print (r_content)
