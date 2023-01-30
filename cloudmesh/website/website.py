@@ -17,6 +17,42 @@ class Website:
         with open(name, "w") as f:
             f.write(content)
 
+    def index(self, directory="."):
+        exclude = [".git/", "__pycache__"]
+        page = textwrap.dedent("""
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <title>Page Title</title>
+            </head>
+            <body>
+            <h1>{directory}</h1>
+            
+            <ul>
+            {content}
+            </ul>
+            
+            </body>
+            </html> """).strip()
+        dirs = []
+        for p in Path(directory).rglob('*'):
+            found = False
+            for word in exclude:
+                if word in str(p):
+                    found = True
+                    break;
+            if not found:
+                dirs.append((str(p)))
+        content = []
+        for d in dirs:
+            url = f'<a href="{d}"> {d} </a>'
+            content.append(url)
+        content = "\n".join(content)
+
+        print (page.format(content=content,directory=directory))
+
+
+
     def replace(self, directory=".", replace_file="replace.txt", find_only=False):
 
         r_content = readfile(replace_file)

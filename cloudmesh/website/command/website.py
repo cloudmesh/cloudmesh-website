@@ -26,6 +26,7 @@ class WebsiteCommand(PluginCommand):
                 website broken links [DIRECTORY] [--mode=python] [--relative] [--dryrun]
                 website rsync [--parameters=PARAMETERS] [--parallel] SOURCE DESTINATION [--dryrun]
                 website replace DIRECTORY REPLACE_FILE
+                website index DIRECTORY
 
           This command introduces some convenient website manipulation programs.
 
@@ -79,5 +80,8 @@ class WebsiteCommand(PluginCommand):
                                     parallel=arguments.parallel)
         elif arguments.replace:
             w.replace(directory=arguments.DIRECTORY, replace_file=arguments.REPLACE_FILE)
+
+        elif arguments.index:
+            w.index(directory=arguments.DIRECTORY)
 
         return ""
