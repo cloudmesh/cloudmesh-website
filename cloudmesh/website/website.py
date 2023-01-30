@@ -17,9 +17,9 @@ class Website:
         with open(name, "w") as f:
             f.write(content)
 
-    def index(self, directory=".", dironly=True):
+    def index(self, directory=".", dironly=True, progress=False):
         exclude = [".git/", "__pycache__"]
-        page = textwrap.dedent("""
+        page_start = textwrap.dedent("""
             <!DOCTYPE html>
             <html>
             <head>
@@ -29,12 +29,15 @@ class Website:
             <h1>{directory}</h1>
             
             <ul>
+            """).strip()
+        page_end = textwrap.dedent("""
             {content}
             </ul>
             
             </body>
             </html> """).strip()
-        dirs = []
+
+        print(page_start)
         for p in Path(directory).rglob('*'):
             if dironly and Path(p).is_dir():
                 pass
@@ -48,15 +51,12 @@ class Website:
                     found = True
                     break;
             if not found:
-                dirs.append((str(p)))
-        content = []
-        for d in dirs:
-            url = f'<a href="{d}"> {d} </a>'
-            content.append(url)
-        content = "\n".join(content)
-
-        print (page.format(content=content,directory=directory))
-
+                if progress:
+                    print (p)
+                d = str(p)
+                url = f'<a href="{d}"> {d} </a>'
+                print(url)
+        print(page_end)
 
 
     def replace(self, directory=".", replace_file="replace.txt", find_only=False):
