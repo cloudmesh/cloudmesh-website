@@ -17,7 +17,7 @@ class Website:
         with open(name, "w") as f:
             f.write(content)
 
-    def index(self, directory="."):
+    def index(self, directory=".", dironly=True):
         exclude = [".git/", "__pycache__"]
         page = textwrap.dedent("""
             <!DOCTYPE html>
@@ -36,6 +36,12 @@ class Website:
             </html> """).strip()
         dirs = []
         for p in Path(directory).rglob('*'):
+            if dironly and Path(p).is_dir():
+                pass
+            elif not dironly:
+                pass
+            else:
+                continue
             found = False
             for word in exclude:
                 if word in str(p):

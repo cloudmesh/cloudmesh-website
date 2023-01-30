@@ -26,7 +26,7 @@ class WebsiteCommand(PluginCommand):
                 website broken links [DIRECTORY] [--mode=python] [--relative] [--dryrun]
                 website rsync [--parameters=PARAMETERS] [--parallel] SOURCE DESTINATION [--dryrun]
                 website replace DIRECTORY REPLACE_FILE
-                website index DIRECTORY
+                website index DIRECTORY [--dironly]
 
           This command introduces some convenient website manipulation programs.
 
@@ -37,6 +37,7 @@ class WebsiteCommand(PluginCommand):
               --dryrun     Dryrun the command and do not execute [default=False].
               --recursive  Run recursively in the directory tree [default=False].
               --parallel   Run in parallel in the background [default=False].
+              --dironly    Only include the directory names [default=False].
 
           Description:
 
@@ -53,7 +54,7 @@ class WebsiteCommand(PluginCommand):
         variables = Variables()
         variables["debug"] = True
 
-        map_parameters(arguments, "recursive", "dryrun", "parallel", "python", "relative")
+        map_parameters(arguments, "recursive", "dryrun", "parallel", "python", "relative", "dironly")
 
         VERBOSE(arguments)
 
@@ -82,6 +83,6 @@ class WebsiteCommand(PluginCommand):
             w.replace(directory=arguments.DIRECTORY, replace_file=arguments.REPLACE_FILE)
 
         elif arguments.index:
-            w.index(directory=arguments.DIRECTORY)
+            w.index(directory=arguments.DIRECTORY, dironly=arguments.dironly)
 
         return ""
