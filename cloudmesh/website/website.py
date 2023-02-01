@@ -38,6 +38,14 @@ class Website:
         else:
             return self.find_files_at_depth(path, depth)
 
+    def print_dir_url(self, p):
+        d = str(p)
+        url = f'<a href="{d}"> {d} </a>'
+        try:
+            print(url)
+        except Exception as e:
+            print ("ERROR:", p)
+            print (e)
     def index(self, directory=".", dironly=True, progress=False, recursive=True, depth=None,
               nopage=False):
         exclude = [".git/", "__pycache__"]
@@ -79,9 +87,7 @@ class Website:
                 if not found:
                     if progress:
                         print (p)
-                    d = str(p)
-                    url = f'<a href="{d}"> {d} </a>'
-                    print(url.encode("utf-8"))
+                    self.print_dir_url(p)
         elif recursive:
             for p in Path(directory).rglob('*'):
                 if dironly and Path(p).is_dir():
@@ -98,9 +104,7 @@ class Website:
                 if not found:
                     if progress:
                         print (p)
-                    d = str(p)
-                    url = f'<a href="{d}"> {d} </a>'
-                    print(url.encode("utf-8"))
+                    self.print_dir_url(p)
         else:
             for p in Path(directory).glob('*'):
                 if dironly and Path(p).is_dir():
@@ -117,9 +121,7 @@ class Website:
                 if not found:
                     if progress:
                         print (p)
-                    d = str(p)
-                    url = f'<a href="{d}"> {d} </a>'
-                    print(url)
+                    self.print_dir_url(p)
         print ("</ul>")
         print()
         if not nopage:
