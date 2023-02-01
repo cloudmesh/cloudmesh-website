@@ -46,11 +46,12 @@ class Website:
             print(url)
         except Exception as e:
             print()
+            print (e)
+            print("---------------------------------")
             print ("ERROR:", p.decode('utf8','surrogateescape'))
             Console.error(p.decode('utf8','surrogateescape'))
+            print("---------------------------------")
 
-            print()
-            print (e)
 
     def index(self, directory=".", dironly=True, progress=False, recursive=True, depth=None,
               nopage=False):
