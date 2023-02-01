@@ -17,7 +17,7 @@ class Website:
         with open(name, "w") as f:
             f.write(content)
 
-    def index(self, directory=".", dironly=True, progress=False):
+    def index(self, directory=".", dironly=True, progress=False, recursive=True):
         exclude = [".git/", "__pycache__"]
         page_start = textwrap.dedent("""
             <!DOCTYPE html>
@@ -31,31 +31,51 @@ class Website:
             <ul>
             """).strip()
         page_end = textwrap.dedent("""
-            {content}
             </ul>
             
             </body>
             </html> """).strip()
 
         print(page_start)
-        for p in Path(directory).rglob('*'):
-            if dironly and Path(p).is_dir():
-                pass
-            elif not dironly:
-                pass
-            else:
-                continue
-            found = False
-            for word in exclude:
-                if word in str(p):
-                    found = True
-                    break;
-            if not found:
-                if progress:
-                    print (p)
-                d = str(p)
-                url = f'<a href="{d}"> {d} </a>'
-                print(url)
+
+        if recursive:
+            for p in Path(directory).rglob('*'):
+                if dironly and Path(p).is_dir():
+                    pass
+                elif not dironly:
+                    pass
+                else:
+                    continue
+                found = False
+                for word in exclude:
+                    if word in str(p):
+                        found = True
+                        break;
+                if not found:
+                    if progress:
+                        print (p)
+                    d = str(p)
+                    url = f'<a href="{d}"> {d} </a>'
+                    print(url)
+        else:
+            for p in Path(directory).glob('*'):
+                if dironly and Path(p).is_dir():
+                    pass
+                elif not dironly:
+                    pass
+                else:
+                    continue
+                found = False
+                for word in exclude:
+                    if word in str(p):
+                        found = True
+                        break;
+                if not found:
+                    if progress:
+                        print (p)
+                    d = str(p)
+                    url = f'<a href="{d}"> {d} </a>'
+                    print(url)
         print(page_end)
 
 
