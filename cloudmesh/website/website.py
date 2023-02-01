@@ -24,13 +24,13 @@ class Website:
             for entry in p:
                 yield entry.path
                 if entry.is_dir() and depth > 0:
-                    yield from self._walk_to_depth(entry.path, depth)
+                    yield from self._walk_to_depth(f"{entry.path}", depth)
 
     def find_files_at_depth(self, p, depth):
         p = Path(p)
         assert p.exists(), f'Path: {p} does not exist'
         pattern = os.path.join(p, '*/' * depth)
-        return list(glob.glob(pattern))
+        return list(glob.glob(f"{pattern}"))
 
     def _walk(self, path, depth, recursive):
         if recursive:
