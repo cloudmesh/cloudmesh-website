@@ -41,7 +41,7 @@ class Website:
 
     def print_dir_url(self, p):
         d = str(p)
-        url = f'<a href="{d}"> {d} </a>'
+        url = f'<li> <a href="{d}"> {d} </a> </li>'
         try:
             print(url)
         except Exception as e:
