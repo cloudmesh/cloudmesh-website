@@ -6,6 +6,7 @@ from pathlib import Path
 from cloudmesh.common.Shell import Shell
 from cloudmesh.common.util import readfile
 import glob
+from cloudmesh.common.console import Console
 
 class Website:
 
@@ -44,8 +45,13 @@ class Website:
         try:
             print(url)
         except Exception as e:
+            print()
             print ("ERROR:", p.decode('utf8','surrogateescape'))
+            Console.error(p.decode('utf8','surrogateescape'))
+
+            print()
             print (e)
+
     def index(self, directory=".", dironly=True, progress=False, recursive=True, depth=None,
               nopage=False):
         exclude = [".git/", "__pycache__"]
