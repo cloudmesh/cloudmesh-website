@@ -5,6 +5,7 @@ from cloudmesh.common.console import Console
 from pathlib import Path
 from cloudmesh.common.Shell import Shell
 from cloudmesh.common.util import readfile
+import glob
 
 class Website:
 
@@ -17,7 +18,28 @@ class Website:
         with open(name, "w") as f:
             f.write(content)
 
-    def index(self, directory=".", dironly=True, progress=False, recursive=True):
+    def _walk_to_depth(self, path, depth):
+        depth -= 1
+        with os.scandir(path) as p:
+            for entry in p:
+                yield entry.path
+                if entry.is_dir() and depth > 0:
+                    yield from self._walk_to_depth(entry.path, depth)
+
+    def find_files_at_depth(self, p, depth):
+        p = Path(p)
+        assert p.exists(), f'Path: {p} does not exist'
+        pattern = os.path.join(p, '*/' * depth)
+        return list(glob.glob(pattern))
+
+    def _walk(self, path, depth, recursive):
+        if recursive:
+            return self._walk_to_depth(path, depth)
+        else:
+            return self.find_files_at_depth(path, depth)
+
+    def index(self, directory=".", dironly=True, progress=False, recursive=True, depth=None,
+              nopage=False):
         exclude = [".git/", "__pycache__"]
         page_start = textwrap.dedent("""
             <!DOCTYPE html>
@@ -27,18 +49,40 @@ class Website:
             </head>
             <body>
             <h1>{directory}</h1>
-            
-            <ul>
             """).strip()
-        page_end = textwrap.dedent("""
-            </ul>
-            
+        page_end = textwrap.dedent("""            
             </body>
             </html> """).strip()
 
-        print(page_start)
+        if not nopage:
+            print(page_start)
 
-        if recursive:
+        print()
+        print ("<ul>")
+
+        if depth is not None:
+            location = Path(directory)
+            #candidates = self.find_files_at_depth(location, depth)
+            #for p in candidates:
+            for p in self._walk(location, depth, recursive):
+                if dironly and Path(p).is_dir():
+                    pass
+                elif not dironly:
+                    pass
+                else:
+                    continue
+                found = False
+                for word in exclude:
+                    if word in str(p):
+                        found = True
+                        break;
+                if not found:
+                    if progress:
+                        print (p)
+                    d = str(p)
+                    url = f'<a href="{d}"> {d} </a>'
+                    print(url)
+        elif recursive:
             for p in Path(directory).rglob('*'):
                 if dironly and Path(p).is_dir():
                     pass
@@ -76,7 +120,10 @@ class Website:
                     d = str(p)
                     url = f'<a href="{d}"> {d} </a>'
                     print(url)
-        print(page_end)
+        print ("</ul>")
+        print()
+        if not nopage:
+            print(page_end)
 
 
     def replace(self, directory=".", replace_file="replace.txt", find_only=False):

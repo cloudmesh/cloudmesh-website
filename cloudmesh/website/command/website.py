@@ -26,7 +26,7 @@ class WebsiteCommand(PluginCommand):
                 website broken links [DIRECTORY] [--mode=python] [--relative] [--dryrun]
                 website rsync [--parameters=PARAMETERS] [--parallel] SOURCE DESTINATION [--dryrun]
                 website replace DIRECTORY REPLACE_FILE
-                website index DIRECTORY [--dironly] [--recursive]
+                website index DIRECTORY [--dironly] [--recursive] [--depth=DEPTH] [--nopage]
 
           This command introduces some convenient website manipulation programs.
 
@@ -38,6 +38,7 @@ class WebsiteCommand(PluginCommand):
               --recursive  Run recursively in the directory tree [default=False].
               --parallel   Run in parallel in the background [default=False].
               --dironly    Only include the directory names [default=False].
+              --depth=DEPTH  Depth of a non recursive search [default=None].
 
           Description:
 
@@ -54,7 +55,15 @@ class WebsiteCommand(PluginCommand):
         variables = Variables()
         variables["debug"] = True
 
-        map_parameters(arguments, "recursive", "dryrun", "parallel", "python", "relative", "dironly")
+        map_parameters(arguments,
+                       "recursive",
+                       "dryrun",
+                       "parallel",
+                       "python",
+                       "relative",
+                       "dironly",
+                       "depth",
+                       "nopage")
 
         VERBOSE(arguments)
 
@@ -77,12 +86,20 @@ class WebsiteCommand(PluginCommand):
         elif arguments.rsync:
             arguments.SOURCE = os.path.abspath(arguments.SOURCE)
             arguments.DESTINATION = os.path.abspath(arguments.DESTINATION)
-            w.rsync_dir_in_parallel(source=arguments.SOURCE, destination=arguments.DESTINATION, dryrun=arguments.dryrun,
+            w.rsync_dir_in_parallel(source=arguments.SOURCE,
+                                    destination=arguments.DESTINATION,
+                                    dryrun=arguments.dryrun,
                                     parallel=arguments.parallel)
         elif arguments.replace:
             w.replace(directory=arguments.DIRECTORY, replace_file=arguments.REPLACE_FILE)
 
         elif arguments.index:
-            w.index(directory=arguments.DIRECTORY, dironly=arguments.dironly, recursive=arguments.recursive)
+            if arguments.depth is not None:
+                arguments.depth = int(arguments.depth)
+            w.index(directory=arguments.DIRECTORY,
+                    dironly=arguments.dironly,
+                    recursive=arguments.recursive,
+                    depth=arguments.depth,
+                    nopage=arguments.nopage)
 
         return ""
