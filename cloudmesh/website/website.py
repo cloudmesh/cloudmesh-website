@@ -48,8 +48,8 @@ class Website:
             print()
             print (e)
             print("---------------------------------")
-            print ("ERROR:", p.encode('unicode-escape').decode('ascii'))
-            Console.error(p.encode('unicode-escape').decode('ascii'))
+            print ("ERROR:", p.encode('utf-8', 'surrogateescape').decode('utf-8'))
+            Console.error(p.encode('utf-8', 'surrogateescape').decode('utf-8'))
             print("---------------------------------")
 
 
